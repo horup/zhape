@@ -1,0 +1,45 @@
+{
+  "name": "zhape",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "webpack",
+    "watch": "concurrently --kill-others \"webpack --watch\" \"ws\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/horup/zhape"
+  },
+  "author": "Søren Alsbjerg Hørup",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/horup/zhape/issues"
+  },
+  "homepage": "https://github.com/horup/zhape#readme",
+  "devDependencies": {
+    "@types/node": "^8.0.7",
+    "awesome-typescript-loader": "^3.1.3",
+    "concurrently": "^3.5.0",
+    "css-loader": "^0.28.4",
+    "html-webpack-plugin": "^2.29.0",
+    "local-web-server": "^1.2.8",
+    "style-loader": "^0.18.2",
+    "typescript": "^2.3.4",
+    "webpack": "^3.0.0"
+  },
+  "local-web-server": {
+    "port": 8080,
+    "rewrite": [
+      {
+        "from": "/*",
+        "to": "/dist/$1"
+      }
+    ]
+  },
+  "dependencies": {
+    "@types/react": "^15.0.32",
+    "@types/react-dom": "^15.5.1",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1"
+  },
+  "main": "webpack.config.js"
+}
