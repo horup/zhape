@@ -22,12 +22,13 @@ export default class Topdown extends React.Component<any, {width:number, height:
 
         window.addEventListener("click", (e)=>
         {
-            console.log(e);
+            this.renderer.click = true;
         });
 
         window.addEventListener("mousemove", (e)=>
         {
-            console.log(e);
+            this.renderer.mouseX = e.x;
+            this.renderer.mouseY = e.y;
         });
     }
 
