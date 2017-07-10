@@ -1,5 +1,8 @@
+
+import * as Model from '../../model';
 export default class Renderer
 {
+    map:Model.Map = new Model.Map();
     click:boolean = false;
     mouseX = 0;
     mouseY = 0;
@@ -67,7 +70,7 @@ export default class Renderer
     drawWorkingSet()
     {
         let c = this.context;
-        c.strokeStyle = 'white';
+        c.strokeStyle = 'green';
         c.beginPath();
         for (let p of this.workingSet)
         {
@@ -83,15 +86,44 @@ export default class Renderer
 
     drawEdges()
     {
-        for (let edge of this.edges)
+        for (let edge of this.map.edges)
         {
             let c = this.context;
-            c.strokeStyle = 'white';
-            c.beginPath();
-            for (let p of edge)
+            if (edge.left != null && edge.right != null)
             {
-                c.lineTo(p.x + 0.5, p.y + 0.5);
+                c.strokeStyle = 'red';
             }
+            else
+            {
+                c.strokeStyle = 'white';
+            }
+            let vx = (edge.end.x - edge.start.x);
+            let vy = (edge.end.y - edge.start.y);
+            let l = Math.sqrt(vx * vx + vy * vy);
+            if (l != 0)
+            {
+                vx /= l;
+                vy /= l;
+            }
+            
+            c.beginPath();
+            c.moveTo(edge.start.x + 0.5, edge.start.y + 0.5);
+            let nl = 16;
+            if (edge.left != null)
+            {
+                c.moveTo(edge.start.x + vx * l/2 + 0.5, edge.start.y + vy * l/2 + 0.5);
+                c.lineTo(edge.start.x + vx * l/2 + -vy * nl + 0.5, 
+                         edge.start.y + vy * l/2 + vx * nl + 0.5);
+                c.moveTo(edge.start.x + 0.5, edge.start.y + 0.5);
+            }
+            if (edge.right != null)
+            {
+                c.moveTo(edge.start.x + vx * l/2 + 0.5, edge.start.y + vy * l/2 + 0.5);
+                c.lineTo(edge.start.x + vx * l/2 + -vy * -nl + 0.5, 
+                         edge.start.y + vy * l/2 + vx * -nl + 0.5);
+                c.moveTo(edge.start.x + 0.5, edge.start.y + 0.5);
+            }
+            c.lineTo(edge.end.x + 0.5, edge.end.y + 0.5);
 
             c.stroke();
         }
@@ -102,15 +134,66 @@ export default class Renderer
         let x = this.snappedX();
         let y = this.snappedY();
         let insert = false;
-        if (this.workingSet.filter((v)=>v.x == x && v.y == v.y).length > 0)
+        if (this.workingSet.length >= 2 &&
+            this.workingSet[0].x == x && this.workingSet[0].y == y)
         {
             insert = true;
         }
-        this.workingSet.push({x:x, y:y});
-       
+
+        if (this.workingSet.filter((p)=>p.x == x && p.y == y).length == 0 || insert)
+            this.workingSet.push({x:x, y:y});
+    
         if (insert)
         {
-            this.edges.push(this.workingSet);
+            //this.edges.push(this.workingSet);
+            let edges:Model.Edge[] = [];
+            for (let i = 0; i < this.workingSet.length; i++)
+            {
+                let edge = new Model.Edge();
+                let p1 = this.workingSet[i];
+                let p2 = this.workingSet[(i+1) % this.workingSet.length];
+                edge.start.set(p1.x, p1.y);
+                edge.end.set(p2.x, p2.y);
+                edges.push(edge);
+             /*   let duplicates = this.map.edges.filter((e)=>e.equals(edge));
+                if (duplicates.length == 0)
+                {
+                    this.map.edges.push(edge);
+                }
+                else
+                {
+                    edge = duplicates[0];
+                    edge.right = new Model.Side();
+                }*/
+            }
+
+            let clockwise = Model.isClockwise(edges);
+            for (let edge of edges)
+            {
+                let side = new Model.Side();
+                if (clockwise)
+                    edge.right = side;
+                else
+                    edge.left = side;
+                let duplicates = this.map.edges.filter((e)=>e.equals(edge));
+                if (duplicates.length == 0)
+                {
+                    this.map.edges.push(edge);
+                }
+                else
+                {
+                    edge = duplicates[0];
+                    if (edge.left != null)
+                    {
+                        edge.right = side;
+                    }
+                    else if (edge.right != null)
+                    {
+                        edge.left = side;
+                    }
+                }
+            }
+
             this.workingSet = [];
         }
     }
