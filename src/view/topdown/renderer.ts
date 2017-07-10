@@ -97,6 +97,7 @@ export default class Renderer
             {
                 c.strokeStyle = 'white';
             }
+            
             let vx = (edge.end.x - edge.start.x);
             let vy = (edge.end.y - edge.start.y);
             let l = Math.sqrt(vx * vx + vy * vy);
@@ -126,6 +127,9 @@ export default class Renderer
             c.lineTo(edge.end.x + 0.5, edge.end.y + 0.5);
 
             c.stroke();
+            let s = 6;
+            c.strokeRect(edge.start.x - s/2, edge.start.y - s/2,s,s);
+            c.strokeRect(edge.end.x - s/2, edge.end.y - s/2,s,s);
         }
     }
 
@@ -145,7 +149,6 @@ export default class Renderer
     
         if (insert)
         {
-            //this.edges.push(this.workingSet);
             let edges:Model.Edge[] = [];
             for (let i = 0; i < this.workingSet.length; i++)
             {
@@ -155,26 +158,17 @@ export default class Renderer
                 edge.start.set(p1.x, p1.y);
                 edge.end.set(p2.x, p2.y);
                 edges.push(edge);
-             /*   let duplicates = this.map.edges.filter((e)=>e.equals(edge));
-                if (duplicates.length == 0)
-                {
-                    this.map.edges.push(edge);
-                }
-                else
-                {
-                    edge = duplicates[0];
-                    edge.right = new Model.Side();
-                }*/
             }
 
             let clockwise = Model.isClockwise(edges);
             for (let edge of edges)
             {
                 let side = new Model.Side();
-                if (clockwise)
-                    edge.right = side;
-                else
+                if (!clockwise)
                     edge.left = side;
+                else
+                    edge.right = side;
+
                 let duplicates = this.map.edges.filter((e)=>e.equals(edge));
                 if (duplicates.length == 0)
                 {
@@ -187,10 +181,14 @@ export default class Renderer
                     {
                         edge.right = side;
                     }
+                /*    if (edge.left != null)
+                    {
+                        edge.right = side;
+                    }
                     else if (edge.right != null)
                     {
                         edge.left = side;
-                    }
+                    }*/
                 }
             }
 

@@ -14,6 +14,11 @@ export class Vertex
             return true;
         return false;
     }
+
+    toArray()
+    {
+        return [this.x, this.y];
+    }
 }
 
 export class Side
@@ -63,4 +68,14 @@ export function isClockwise(edges:Edge[])
     console.log(sum);
 
     return sum < 0;
+}
+
+export function reverse(edges:Edge[])
+{
+    for (let edge of edges)
+    {
+        let temp = edge.start;
+        edge.start = edge.end;
+        edge.end = temp;
+    }
 }
