@@ -11,7 +11,7 @@ export default class Renderer
     context:CanvasRenderingContext2D;
     gridSize = 64;
 
-    workingSet:{x:number, y:number}[] = [];
+    workingSet:Model.Vertex[] = [];
     edges:{x:number, y:number}[][] = [];
     
 
@@ -84,10 +84,23 @@ export default class Renderer
         c.stroke();
     }
 
+    drawVertices()
+    {
+        let c = this.context;
+        c.strokeStyle = 'white';
+        let s = 3;
+        for (let v of this.map.vertices)
+        {
+            c.strokeRect(v.x + 0.5 - s, v.y + 0.5 - s, s*2, s*2);
+        }
+    }
+
     drawEdges()
     {
         for (let edge of this.map.edges)
         {
+            let s = this.map.vertices[edge.start];
+            let e = this.map.vertices[edge.end];
             let c = this.context;
             if (edge.left != null && edge.right != null)
             {
@@ -98,8 +111,8 @@ export default class Renderer
                 c.strokeStyle = 'white';
             }
             
-            let vx = (edge.end.x - edge.start.x);
-            let vy = (edge.end.y - edge.start.y);
+            let vx = (e.x - s.x);
+            let vy = (e.y - s.y);
             let l = Math.sqrt(vx * vx + vy * vy);
             if (l != 0)
             {
@@ -108,28 +121,24 @@ export default class Renderer
             }
             
             c.beginPath();
-            c.moveTo(edge.start.x + 0.5, edge.start.y + 0.5);
+            c.moveTo(s.x + 0.5, s.y + 0.5);
             let nl = 16;
             if (edge.left != null)
             {
-                c.moveTo(edge.start.x + vx * l/2 + 0.5, edge.start.y + vy * l/2 + 0.5);
-                c.lineTo(edge.start.x + vx * l/2 + -vy * nl + 0.5, 
-                         edge.start.y + vy * l/2 + vx * nl + 0.5);
-                c.moveTo(edge.start.x + 0.5, edge.start.y + 0.5);
+                c.moveTo(s.x + vx * l/2 + 0.5, s.y + vy * l/2 + 0.5);
+                c.lineTo(s.x + vx * l/2 + -vy * nl + 0.5, 
+                         s.y + vy * l/2 + vx * nl + 0.5);
+                c.moveTo(s.x + 0.5, s.y + 0.5);
             }
             if (edge.right != null)
             {
-                c.moveTo(edge.start.x + vx * l/2 + 0.5, edge.start.y + vy * l/2 + 0.5);
-                c.lineTo(edge.start.x + vx * l/2 + -vy * -nl + 0.5, 
-                         edge.start.y + vy * l/2 + vx * -nl + 0.5);
-                c.moveTo(edge.start.x + 0.5, edge.start.y + 0.5);
+                c.moveTo(s.x + vx * l/2 + 0.5, s.y + vy * l/2 + 0.5);
+                c.lineTo(s.x + vx * l/2 + -vy * -nl + 0.5, 
+                         s.y + vy * l/2 + vx * -nl + 0.5);
+                c.moveTo(s.x + 0.5, s.y + 0.5);
             }
-            c.lineTo(edge.end.x + 0.5, edge.end.y + 0.5);
-
+            c.lineTo(e.x + 0.5, e.y + 0.5);
             c.stroke();
-            let s = 6;
-            c.strokeRect(edge.start.x - s/2, edge.start.y - s/2,s,s);
-            c.strokeRect(edge.end.x - s/2, edge.end.y - s/2,s,s);
         }
     }
 
@@ -144,24 +153,14 @@ export default class Renderer
             insert = true;
         }
 
-        if (this.workingSet.filter((p)=>p.x == x && p.y == y).length == 0 || insert)
-            this.workingSet.push({x:x, y:y});
-    
+        if (this.workingSet.filter((p)=>p.x == x && p.y == y).length == 0)
+            this.workingSet.push(new Model.Vertex(x, y));
+            
         if (insert)
         {
-            let edges:Model.Edge[] = [];
-            for (let i = 0; i < this.workingSet.length; i++)
-            {
-                let edge = new Model.Edge();
-                let p1 = this.workingSet[i];
-                let p2 = this.workingSet[(i+1) % this.workingSet.length];
-                edge.start.set(p1.x, p1.y);
-                edge.end.set(p2.x, p2.y);
-                edges.push(edge);
-            }
-
-            let clockwise = Model.isClockwise(edges);
-            for (let edge of edges)
+            let indicies = this.map.insertVertices(this.workingSet);
+            this.map.insertEdges(indicies);
+           /* for (let edge of edges)
             {
                 let side = new Model.Side();
                 if (!clockwise)
@@ -181,16 +180,16 @@ export default class Renderer
                     {
                         edge.right = side;
                     }
-                /*    if (edge.left != null)
+                    if (edge.left != null)
                     {
                         edge.right = side;
                     }
                     else if (edge.right != null)
                     {
                         edge.left = side;
-                    }*/
+                    }
                 }
-            }
+            }*/
 
             this.workingSet = [];
         }
@@ -212,6 +211,7 @@ export default class Renderer
         this.drawSnap();
         this.drawWorkingSet();
         this.drawEdges();
+        this.drawVertices();
         requestAnimationFrame(()=>this.animate());
     }
 }
