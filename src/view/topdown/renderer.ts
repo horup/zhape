@@ -13,6 +13,7 @@ export default class Renderer
     input = 
     {
         leftdown:false,
+        rightdown:false,
         mouseX:0,
         mouseY:0,
         undo:false,

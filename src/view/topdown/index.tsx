@@ -22,12 +22,24 @@ export default class Topdown extends React.Component<any, {width:number, height:
 
         window.addEventListener("mousedown", (e)=>
         {
-            this.renderer.input.leftdown = true;
+            if (e.button == 0)
+                this.renderer.input.leftdown = true;
+            else if (e.button == 1)
+                this.renderer.input.rightdown = true;
         });
 
         window.addEventListener("mouseup", (e)=>
         {
-            this.renderer.input.leftdown = false;
+            if (e.button == 0)
+                this.renderer.input.leftdown = false;
+            else if (e.button == 1)
+                this.renderer.input.rightdown = false;
+        });
+
+        window.addEventListener('contextmenu', (e) =>
+        {
+            e.preventDefault();
+            return false;
         });
 
         window.addEventListener("keydown", (e)=>
