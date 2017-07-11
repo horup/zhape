@@ -20,7 +20,10 @@ export default class Renderer
         ins:false,
         split:false,
         camera:false,
-        scroll:false
+        scroll:false,
+        save:false,
+        load:false,
+        grid:false
     }
 
     editing =
@@ -28,8 +31,10 @@ export default class Renderer
         state : State.Pointer,
         scrollX:0,
         scrollY:0,
+        zoom:0,
         mouseX:0,
         mouseY:0,
+        gridSize:64,
         selectedVerticies:[] as Number[]
     }
 
@@ -237,6 +242,38 @@ export default class Renderer
 
     animate()
     {
+        if (this.input.grid)
+        {
+            this.input.grid = false;
+            this.gridSize/=2;
+            if (this.gridSize < 8)
+            {
+                this.gridSize = 64;
+            }
+        }
+        if (this.input.save)
+        {
+            this.input.save = false;
+            localStorage.setItem('quick', JSON.stringify(this.map));
+        }
+        else if (this.input.load)
+        {
+            this.input.load = false;
+            let map = JSON.parse(localStorage.getItem('quick')) as Model.Map;
+            Object.setPrototypeOf(map, Model.Map.prototype);
+            for (let obj of map.edges)
+            {
+                Object.setPrototypeOf(obj, Model.Edge.prototype);
+                if (obj.left != null) Object.setPrototypeOf(obj.left, Model.Side.prototype);
+                if (obj.right != null) Object.setPrototypeOf(obj.right, Model.Side.prototype);
+            }
+            for (let obj of map.vertices)
+                Object.setPrototypeOf(obj, Model.Vertex.prototype);
+            for (let obj of map.sectors)
+                Object.setPrototypeOf(obj, Model.Sector);
+            
+            this.map = map;
+        }
         if (this.editing.state == State.Pointer || this.editing.state == State.Selection)
         {
             if (this.input.leftdown)

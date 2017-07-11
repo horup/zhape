@@ -37,6 +37,18 @@ export default class Topdown extends React.Component<any, {width:number, height:
             {
                 this.renderer.input.ins = true;
             }
+            else if (e.keyCode == 53)
+            {
+                this.renderer.input.save = true;
+            }
+            else if (e.keyCode == 54)
+            {
+                this.renderer.input.load = true;
+            }
+            else if (e.keyCode == 71)
+            {
+                this.renderer.input.grid = true;
+            }
         });
 
         window.addEventListener("mousemove", (e)=>
