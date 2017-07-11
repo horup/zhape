@@ -1,11 +1,39 @@
 
 import * as Model from '../../model';
+enum State
+{
+    Pointer,
+    Selection,
+    Move
+}
+
+
 export default class Renderer
 {
+    input = 
+    {
+        leftdown:false,
+        mouseX:0,
+        mouseY:0,
+        undo:false,
+        redo:false,
+        ins:false,
+        split:false,
+        camera:false,
+        scroll:false
+    }
+
+    editing =
+    {
+        state : State.Pointer,
+        scrollX:0,
+        scrollY:0,
+        mouseX:0,
+        mouseY:0,
+        selectedVerticies:[] as Number[]
+    }
+
     map:Model.Map = new Model.Map();
-    click:boolean = false;
-    mouseX = 0;
-    mouseY = 0;
     width:number;
     height:number;
     context:CanvasRenderingContext2D;
@@ -22,14 +50,14 @@ export default class Renderer
 
     snappedX()
     {
-        let x = this.mouseX + this.gridSize/2;
+        let x = this.input.mouseX + this.gridSize/2;
         x = Math.floor(x / this.gridSize) * this.gridSize;
         return x;
     }
 
     snappedY()
     {
-        let y = this.mouseY + this.gridSize/2;
+        let y = this.input.mouseY + this.gridSize/2;
         y = Math.floor(y / this.gridSize) * this.gridSize;
         return y;
     }
@@ -87,11 +115,17 @@ export default class Renderer
     drawVertices()
     {
         let c = this.context;
-        c.strokeStyle = 'white';
+
         let s = 3;
+        let i = 0;
         for (let v of this.map.vertices)
         {
+            if (this.editing.selectedVerticies.indexOf(i) != -1)
+                c.strokeStyle = 'red';
+            else
+                c.strokeStyle = 'white';
             c.strokeRect(v.x + 0.5 - s, v.y + 0.5 - s, s*2, s*2);
+            i++;
         }
     }
 
@@ -149,7 +183,35 @@ export default class Renderer
         }
     }
 
-    onClick()
+    drawSelection()
+    {
+        if (this.editing.state == State.Selection)
+        {
+            let c = this.context;
+            c.strokeStyle = 'white';
+            let w = this.input.mouseX - this.editing.mouseX;
+            let h = this.input.mouseY - this.editing.mouseY;
+            c.strokeRect(this.editing.mouseX + 0.5, this.editing.mouseY + 0.5, w, h)
+        }
+    }
+
+    select()
+    {
+        let polygon = [this.input.mouseX, this.input.mouseY, 
+                       this.input.mouseX, this.editing.mouseY,
+                       this.editing.mouseX, this.editing.mouseY, 
+                       this.editing.mouseX, this.input.mouseY];
+
+        for (let i = 0; i < this.map.vertices.length; i++)
+        {
+            if (this.map.isInsidePolygon(this.map.vertices[i].x, this.map.vertices[i].y, polygon))
+            {
+                this.editing.selectedVerticies.push(i);
+            }
+        }
+    }
+
+    insertVertex()
     {
         let x = this.snappedX();
         let y = this.snappedY();
@@ -171,12 +233,39 @@ export default class Renderer
         }
     }
 
+
+
     animate()
     {
-        if (this.click)
+        if (this.editing.state == State.Pointer || this.editing.state == State.Selection)
         {
-            this.click = false;
-            this.onClick();
+            if (this.input.leftdown)
+            {
+                if (this.editing.state == State.Pointer)
+                {
+                    this.editing.selectedVerticies = [];
+                    this.editing.state = State.Selection;
+                    this.editing.mouseX = this.input.mouseX;
+                    this.editing.mouseY = this.input.mouseY;
+                }
+            }
+            else if (!this.input.leftdown)
+            {
+                if (this.editing.state == State.Selection)
+                {
+                    this.editing.state = State.Pointer;
+                    this.select();
+                }
+            }
+        }
+
+        if (this.editing.state == State.Pointer)
+        {
+            if (this.input.ins)
+            {
+                this.input.ins = false;
+                this.insertVertex();
+            }
         }
 
         let c = this.context;
@@ -189,6 +278,7 @@ export default class Renderer
         this.drawEdges();
         this.drawVertices();
         this.drawWorkingSet();
+        this.drawSelection();
         requestAnimationFrame(()=>this.animate());
     }
 }

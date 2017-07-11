@@ -167,26 +167,6 @@ export class Map
         }
 
         return polygons;
-
-
-
-      /*  let indicies:number[] = [];
-        for (let edge of this.edges)
-        {
-            if ((edge.left != null && edge.left.sector == sector) || (edge.right != null && edge.right.sector == sector))
-            {
-                let vs = [edge.start, edge.end];
-                for (let v of vs)
-                {
-                    if (indicies.indexOf(v) == -1)
-                    {
-                        indicies.push(v);
-                    }
-                }
-            }
-        }
-
-        return indicies;*/
     }
 
     isInsideSector(x:number, y:number, sector:number)
@@ -201,6 +181,11 @@ export class Map
         }
 
         return PolyK.ContainsPoint(vertices, x, y);
+    }
+
+    isInsidePolygon(x:number, y:number, polygon:number[])
+    {
+        return PolyK.ContainsPoint(polygon, x, y);
     }
 
     isEdgeInsideSector(edge:Edge, sector:number)

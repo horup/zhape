@@ -20,15 +20,29 @@ export default class Topdown extends React.Component<any, {width:number, height:
             this.setState({width:window.innerWidth, height:window.innerHeight});
         });
 
-        window.addEventListener("click", (e)=>
+        window.addEventListener("mousedown", (e)=>
         {
-            this.renderer.click = true;
+            this.renderer.input.leftdown = true;
+        });
+
+        window.addEventListener("mouseup", (e)=>
+        {
+            this.renderer.input.leftdown = false;
+        });
+
+        window.addEventListener("keydown", (e)=>
+        {
+            console.log(e.keyCode);
+            if (e.keyCode == 32)
+            {
+                this.renderer.input.ins = true;
+            }
         });
 
         window.addEventListener("mousemove", (e)=>
         {
-            this.renderer.mouseX = e.x;
-            this.renderer.mouseY = e.y;
+            this.renderer.input.mouseX = e.x;
+            this.renderer.input.mouseY = e.y;
         });
     }
 
