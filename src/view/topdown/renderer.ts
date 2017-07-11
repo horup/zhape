@@ -111,6 +111,9 @@ export default class Renderer
             {
                 c.strokeStyle = 'white';
             }
+
+            let midX = (this.map.vertices[edge.start].x + this.map.vertices[edge.end].x) / 2;
+            let midY = (this.map.vertices[edge.start].y + this.map.vertices[edge.end].y) / 2;
             
             let vx = (e.x - s.x);
             let vy = (e.y - s.y);
@@ -126,22 +129,23 @@ export default class Renderer
             let nl = 8;
             if (edge.left != null)
             {
-              //  c.moveTo(s.x + vx * l/2 + 0.5, s.y + vy * l/2 + 0.5);
-               /* c.lineTo(s.x + vx * l/2 + -vy * nl + 0.5, 
-                         s.y + vy * l/2 + vx * nl + 0.5);*/
-                c.fillText(""+edge.left.sector, s.x + vx * l/2 + -vy * nl + 0.5, s.y + vy * l/2 + vx * nl + 0.5);
-              //  c.moveTo(s.x + 0.5, s.y + 0.5);
+                c.fillText(""+edge.left.sector, midX + -vy * nl + 0.5, midY + vx * nl + 0.5);
             }
             if (edge.right != null)
             {
-              /*  c.moveTo(s.x + vx * l/2 + 0.5, s.y + vy * l/2 + 0.5);
-                c.lineTo(s.x + vx * l/2 + -vy * -nl + 0.5, 
-                         s.y + vy * l/2 + vx * -nl + 0.5);*/
-                c.fillText(""+edge.right.sector, s.x + vx * l/2 + -vy * -nl + 0.5, s.y + vy * l/2 + vx * -nl + 0.5);
-            //    c.moveTo(s.x + 0.5, s.y + 0.5);
+                c.fillText(""+edge.right.sector, midX + -vy * -nl + 0.5, midY + vx * -nl + 0.5);
             }
             c.lineTo(e.x + 0.5, e.y + 0.5);
             c.stroke();
+        }
+    }
+
+    drawSectors()
+    {
+        for (let sector = 0; sector < this.map.sectors.length; sector++)
+        {
+          //  if (this.map.isInsideSector(this.mouseX, this.mouseY, sector))
+            //    console.log(sector);
         }
     }
 
@@ -163,37 +167,6 @@ export default class Renderer
         {
             let indicies = this.map.insertVertices(this.workingSet);
             this.map.insertEdges(indicies);
-           /* for (let edge of edges)
-            {
-                let side = new Model.Side();
-                if (!clockwise)
-                    edge.left = side;
-                else
-                    edge.right = side;
-
-                let duplicates = this.map.edges.filter((e)=>e.equals(edge));
-                if (duplicates.length == 0)
-                {
-                    this.map.edges.push(edge);
-                }
-                else
-                {
-                    edge = duplicates[0];
-                    if (edge.left != null)
-                    {
-                        edge.right = side;
-                    }
-                    if (edge.left != null)
-                    {
-                        edge.right = side;
-                    }
-                    else if (edge.right != null)
-                    {
-                        edge.left = side;
-                    }
-                }
-            }*/
-
             this.workingSet = [];
         }
     }
@@ -212,9 +185,10 @@ export default class Renderer
         c.clearRect(0,0,this.width, this.height);
         this.drawGrid();
         this.drawSnap();
-        this.drawWorkingSet();
+        this.drawSectors();
         this.drawEdges();
         this.drawVertices();
+        this.drawWorkingSet();
         requestAnimationFrame(()=>this.animate());
     }
 }
