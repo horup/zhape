@@ -115,6 +115,10 @@ export class Map
     
     insertEdges(indicies:number[])
     {
+        let sector = new Sector();
+        let sectorIndex = this.sectors.length;
+        this.sectors.push(sector);
+
         for (let i = 0; i < indicies.length; i++)
         {
             let s = indicies[i];
@@ -122,6 +126,7 @@ export class Map
             let edge = new Edge(s, e);
             let clockwise = this.isClockwise(indicies);
             let side = new Side();
+            side.sector = sectorIndex;
             if (clockwise)
                 edge.right = side;
             else

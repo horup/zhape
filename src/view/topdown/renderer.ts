@@ -97,11 +97,12 @@ export default class Renderer
 
     drawEdges()
     {
+        let c = this.context;
+        c.fillStyle = 'white';
         for (let edge of this.map.edges)
         {
             let s = this.map.vertices[edge.start];
             let e = this.map.vertices[edge.end];
-            let c = this.context;
             if (edge.left != null && edge.right != null)
             {
                 c.strokeStyle = 'red';
@@ -122,20 +123,22 @@ export default class Renderer
             
             c.beginPath();
             c.moveTo(s.x + 0.5, s.y + 0.5);
-            let nl = 16;
+            let nl = 8;
             if (edge.left != null)
             {
-                c.moveTo(s.x + vx * l/2 + 0.5, s.y + vy * l/2 + 0.5);
-                c.lineTo(s.x + vx * l/2 + -vy * nl + 0.5, 
-                         s.y + vy * l/2 + vx * nl + 0.5);
-                c.moveTo(s.x + 0.5, s.y + 0.5);
+              //  c.moveTo(s.x + vx * l/2 + 0.5, s.y + vy * l/2 + 0.5);
+               /* c.lineTo(s.x + vx * l/2 + -vy * nl + 0.5, 
+                         s.y + vy * l/2 + vx * nl + 0.5);*/
+                c.fillText(""+edge.left.sector, s.x + vx * l/2 + -vy * nl + 0.5, s.y + vy * l/2 + vx * nl + 0.5);
+              //  c.moveTo(s.x + 0.5, s.y + 0.5);
             }
             if (edge.right != null)
             {
-                c.moveTo(s.x + vx * l/2 + 0.5, s.y + vy * l/2 + 0.5);
+              /*  c.moveTo(s.x + vx * l/2 + 0.5, s.y + vy * l/2 + 0.5);
                 c.lineTo(s.x + vx * l/2 + -vy * -nl + 0.5, 
-                         s.y + vy * l/2 + vx * -nl + 0.5);
-                c.moveTo(s.x + 0.5, s.y + 0.5);
+                         s.y + vy * l/2 + vx * -nl + 0.5);*/
+                c.fillText(""+edge.right.sector, s.x + vx * l/2 + -vy * -nl + 0.5, s.y + vy * l/2 + vx * -nl + 0.5);
+            //    c.moveTo(s.x + 0.5, s.y + 0.5);
             }
             c.lineTo(e.x + 0.5, e.y + 0.5);
             c.stroke();
