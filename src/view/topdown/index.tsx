@@ -22,9 +22,10 @@ export default class Topdown extends React.Component<any, {width:number, height:
 
         window.addEventListener("mousedown", (e)=>
         {
+            console.log(e.button);
             if (e.button == 0)
                 this.renderer.input.leftdown = true;
-            else if (e.button == 1)
+            else
                 this.renderer.input.rightdown = true;
         });
 
@@ -32,7 +33,7 @@ export default class Topdown extends React.Component<any, {width:number, height:
         {
             if (e.button == 0)
                 this.renderer.input.leftdown = false;
-            else if (e.button == 1)
+            else
                 this.renderer.input.rightdown = false;
         });
 

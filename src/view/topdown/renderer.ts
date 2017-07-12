@@ -54,6 +54,19 @@ export default class Renderer
         this.context = context;
     }
 
+    scrX(x:number)
+    {
+        x += this.editing.scrollX;
+        return x;
+    }
+
+    scrY(y:number)
+    {
+        y += this.editing.scrollY;
+        return y;
+    }
+    
+
     snappedX()
     {
         let x = this.input.mouseX + this.gridSize/2;
@@ -70,6 +83,7 @@ export default class Renderer
 
     drawGrid()
     {
+        return;
         let offx = 0;
         let offy = 0;
         let c = this.context;
@@ -82,7 +96,7 @@ export default class Renderer
             c.lineTo(this.width+0.5, y+0.5);
             c.stroke();
         }
-        for (let x = 0; x < this.height;x+=this.gridSize)
+        for (let x = 0; x < this.width;x+=this.gridSize)
         {
             c.beginPath();
             c.moveTo(x+0.5, 0);
@@ -130,7 +144,7 @@ export default class Renderer
                 c.strokeStyle = 'red';
             else
                 c.strokeStyle = 'white';
-            c.strokeRect(v.x + 0.5 - s, v.y + 0.5 - s, s*2, s*2);
+            c.strokeRect(this.scrX(v.x) + 0.5 - s, this.scrY(v.y) + 0.5 - s, s*2, s*2);
             i++;
         }
     }
@@ -151,9 +165,9 @@ export default class Renderer
             {
                 c.strokeStyle = 'white';
             }
-
-            let midX = (this.map.vertices[edge.start].x + this.map.vertices[edge.end].x) / 2;
-            let midY = (this.map.vertices[edge.start].y + this.map.vertices[edge.end].y) / 2;
+            
+            let midX = this.scrX((this.map.vertices[edge.start].x + this.map.vertices[edge.end].x) / 2);
+            let midY = this.scrY((this.map.vertices[edge.start].y + this.map.vertices[edge.end].y) / 2);
             
             let vx = (e.x - s.x);
             let vy = (e.y - s.y);
@@ -165,7 +179,7 @@ export default class Renderer
             }
             
             c.beginPath();
-            c.moveTo(s.x + 0.5, s.y + 0.5);
+            c.moveTo(this.scrX(s.x) + 0.5, this.scrY(s.y) + 0.5);
             let nl = 8;
             if (edge.left != null)
             {
@@ -175,7 +189,7 @@ export default class Renderer
             {
                 c.fillText(""+edge.right.sector, midX + -vy * -nl + 0.5, midY + vx * -nl + 0.5);
             }
-            c.lineTo(e.x + 0.5, e.y + 0.5);
+            c.lineTo(this.scrX(e.x) + 0.5, this.scrY(e.y) + 0.5);
             c.stroke();
         }
     }
@@ -243,6 +257,29 @@ export default class Renderer
 
     animate()
     {
+        if (this.input.rightdown)
+        {
+            if (this.editing.state != State.Move)
+            {
+                this.editing.mouseX = this.input.mouseX;
+                this.editing.mouseY = this.input.mouseY;
+                this.editing.state = State.Move;
+            }
+            else
+            {
+                let mx = this.editing.mouseX - this.input.mouseX;
+                let my = this.editing.mouseY - this.input.mouseY;
+                this.editing.scrollX -= mx;
+                this.editing.scrollY -= my
+                this.editing.mouseX = this.input.mouseX;
+                this.editing.mouseY = this.input.mouseY;
+            }
+        }
+        else if (this.editing.state == State.Move)
+        {
+            this.editing.state = State.Pointer;
+        }
+
         if (this.input.grid)
         {
             this.input.grid = false;
