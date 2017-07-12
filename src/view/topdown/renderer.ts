@@ -255,7 +255,10 @@ export default class Renderer
         if (this.input.save)
         {
             this.input.save = false;
-            localStorage.setItem('quick', JSON.stringify(this.map));
+            if (this.map.edges.length > 0)
+            {
+                localStorage.setItem('quick', JSON.stringify(this.map));
+            }
         }
         else if (this.input.load)
         {
