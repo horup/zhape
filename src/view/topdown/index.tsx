@@ -37,6 +37,12 @@ export default class Topdown extends React.Component<any, {width:number, height:
                 this.renderer.input.rightdown = false;
         });
 
+        window.addEventListener("wheel", (e)=>
+        {
+            let dir = Math.sign(e.deltaY);
+            this.renderer.input.zoom = dir;
+        });
+
         window.addEventListener('contextmenu', (e) =>
         {
             e.preventDefault();

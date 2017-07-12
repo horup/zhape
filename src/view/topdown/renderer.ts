@@ -21,7 +21,7 @@ export default class Renderer
         ins:false,
         split:false,
         camera:false,
-        scroll:false,
+        zoom:0,
         save:false,
         load:false,
         grid:false
@@ -32,7 +32,7 @@ export default class Renderer
         state : State.Pointer,
         scrollX:0,
         scrollY:0,
-        zoom:0,
+        zoom:1,
         mouseX:0,
         mouseY:0,
         gridSize:64,
@@ -56,12 +56,14 @@ export default class Renderer
 
     scrX(x:number)
     {
+        x *= this.editing.zoom;
         x += this.editing.scrollX;
         return x;
     }
 
     scrY(y:number)
     {
+        y *= this.editing.zoom;
         y += this.editing.scrollY;
         return y;
     }
@@ -257,6 +259,19 @@ export default class Renderer
 
     animate()
     {
+        if (this.input.zoom != 0)
+        {
+            let diff = this.editing.zoom;
+            if (this.input.zoom < 0)
+                this.editing.zoom *= 2;
+            else
+                this.editing.zoom /= 2;
+            diff = diff - this.editing.zoom;
+            this.editing.scrollX += this.width * diff/2;
+            this.editing.scrollY += this.height * diff/2;
+
+            this.input.zoom = 0;
+        }
         if (this.input.rightdown)
         {
             if (this.editing.state != State.Move)
