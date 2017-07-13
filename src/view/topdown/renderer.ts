@@ -65,22 +65,7 @@ export default class Renderer
     }
 
 
-    drawWorkingSet()
-    {
-        let c = this.context;
-        c.strokeStyle = 'green';
-        c.beginPath();
-        for (let p of this.workingSet)
-        {
-            c.lineTo(p.x + 0.5, p.y + 0.5);
-        }
-
-        let x = this.snappedX();
-        let y = this.snappedY();
-        c.lineTo(x + 0.5, y + 0.5);
-        
-        c.stroke();
-    }
+   
 
    
 
@@ -266,7 +251,7 @@ export default class Renderer
         this.drawSectors();
         this.draw.drawEdges();
         this.draw.drawVertices();
-        this.drawWorkingSet();
+        this.draw.drawWorkingSet();
         this.drawSelection();
         this.draw.drawSnap();
         requestAnimationFrame(()=>this.animate());

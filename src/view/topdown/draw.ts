@@ -138,6 +138,23 @@ export default class Draw
             }
         }
     }
+
+    drawWorkingSet()
+    {
+        let c = this.renderer.context;
+        c.strokeStyle = 'green';
+        c.beginPath();
+        for (let p of this.renderer.workingSet)
+        {
+            c.lineTo(this.scrX(p.x) + 0.5, this.scrY(p.y) + 0.5);
+        }
+
+        let x = this.scrX(this.renderer.snappedX());
+        let y = this.scrY(this.renderer.snappedY());
+        c.lineTo(x + 0.5, y + 0.5);
+        
+        c.stroke();
+    }
     
 
     
