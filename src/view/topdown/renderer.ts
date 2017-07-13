@@ -1,5 +1,5 @@
-
 import * as Model from '../../model';
+import Draw from './draw';
 enum State
 {
     Pointer,
@@ -10,6 +10,7 @@ enum State
 
 export default class Renderer
 {
+    draw = new Draw(this);
     input = 
     {
         leftdown:false,
@@ -29,10 +30,8 @@ export default class Renderer
 
     editing =
     {
-        state : State.Pointer,
-        scrollX:0,
-        scrollY:0,
-        zoom:1,
+        state : State  .Pointer,
+        
         mouseX:0,
         mouseY:0,
         gridSize:64,
@@ -40,10 +39,7 @@ export default class Renderer
     }
 
     map:Model.Map = new Model.Map();
-    width:number;
-    height:number;
     context:CanvasRenderingContext2D;
-    gridSize = 64;
 
     workingSet:Model.Vertex[] = [];
     edges:{x:number, y:number}[][] = [];
@@ -54,83 +50,20 @@ export default class Renderer
         this.context = context;
     }
 
-    scrX(x:number)
-    {
-        x *= this.editing.zoom;
-        x += this.editing.scrollX;
-        return x;
-    }
-
-    wrlX(x:number)
-    {
-        x -= this.editing.scrollX;        
-        x /= this.editing.zoom;
-        return x;
-    }
-
-    scrY(y:number)
-    {
-        y *= this.editing.zoom;
-        y += this.editing.scrollY;
-        return y;
-    }
-
-     wrlY(y:number)
-    {
-        y -= this.editing.scrollY;        
-        y /= this.editing.zoom;
-        return y;
-    }
-    
-    
-
     snappedX()
     {
-        let x = this.input.mouseX + this.gridSize/2;
-        x = Math.floor(x / this.gridSize) * this.gridSize;
+        let x = this.draw.wrlX(this.input.mouseX) + this.draw.gridSize/2;
+        x = Math.floor(x / this.draw.gridSize) * this.draw.gridSize;
         return x;
     }
-
+     
     snappedY()
     {
-        let y = this.input.mouseY + this.gridSize/2;
-        y = Math.floor(y / this.gridSize) * this.gridSize;
+        let y = this.draw.wrlY(this.input.mouseY) + this.draw.gridSize/2;
+        y = Math.floor(y / this.draw.gridSize) * this.draw.gridSize;
         return y;
     }
 
-    drawGrid()
-    {
-        return;
-        let offx = 0;
-        let offy = 0;
-        let c = this.context;
-        c.strokeStyle ="#505050";
-        c.lineWidth = 1;
-        for (let y = 0; y < this.height;y+=this.gridSize)
-        {
-            c.beginPath();
-            c.moveTo(0, y+0.5);
-            c.lineTo(this.width+0.5, y+0.5);
-            c.stroke();
-        }
-        for (let x = 0; x < this.width;x+=this.gridSize)
-        {
-            c.beginPath();
-            c.moveTo(x+0.5, 0);
-            c.lineTo(x+0.5, this.height);
-            c.stroke();
-        }
-    }
-
-    drawSnap()
-    {
-        let c = this.context;
-        c.strokeStyle = 'white';
-        let x = this.snappedX() + 0.5;
-        let y = this.snappedY() + 0.5;
-        let s = 6;
-        c.strokeRect(x - s/2,y - s/2,s,s);
-    }
 
     drawWorkingSet()
     {
@@ -149,67 +82,9 @@ export default class Renderer
         c.stroke();
     }
 
-    drawVertices()
-    {
-        let c = this.context;
+   
 
-        let s = 3;
-        let i = 0;
-        for (let v of this.map.vertices)
-        {
-            if (this.editing.selectedVerticies.indexOf(i) != -1)
-                c.strokeStyle = 'red';
-            else
-                c.strokeStyle = 'white';
-            c.strokeRect(this.scrX(v.x) + 0.5 - s, this.scrY(v.y) + 0.5 - s, s*2, s*2);
-            i++;
-        }
-    }
-
-    drawEdges()
-    {
-        let c = this.context;
-        c.fillStyle = 'white';
-        for (let edge of this.map.edges)
-        {
-            let s = this.map.vertices[edge.start];
-            let e = this.map.vertices[edge.end];
-            if (edge.left != null && edge.right != null)
-            {
-                c.strokeStyle = 'red';
-            }
-            else
-            {
-                c.strokeStyle = 'white';
-            }
-            
-            let midX = this.scrX((this.map.vertices[edge.start].x + this.map.vertices[edge.end].x) / 2);
-            let midY = this.scrY((this.map.vertices[edge.start].y + this.map.vertices[edge.end].y) / 2);
-            
-            let vx = (e.x - s.x);
-            let vy = (e.y - s.y);
-            let l = Math.sqrt(vx * vx + vy * vy);
-            if (l != 0)
-            {
-                vx /= l;
-                vy /= l;
-            }
-            
-            c.beginPath();
-            c.moveTo(this.scrX(s.x) + 0.5, this.scrY(s.y) + 0.5);
-            let nl = 8;
-            if (edge.left != null)
-            {
-                c.fillText(""+edge.left.sector, midX + -vy * nl + 0.5, midY + vx * nl + 0.5);
-            }
-            if (edge.right != null)
-            {
-                c.fillText(""+edge.right.sector, midX + -vy * -nl + 0.5, midY + vx * -nl + 0.5);
-            }
-            c.lineTo(this.scrX(e.x) + 0.5, this.scrY(e.y) + 0.5);
-            c.stroke();
-        }
-    }
+    
 
     drawSectors()
     {
@@ -274,23 +149,26 @@ export default class Renderer
 
     animate()
     {
+        let c = this.context;
+        this.draw.width = c.canvas.width;
+        this.draw.height = c.canvas.height;
         if (this.input.zoom != 0)
         {
-            let mx = this.wrlX(this.input.mouseX);// - this.wrlX(this.width / 2);
-            let my = this.wrlY(this.input.mouseY);// - this.wrlY(this.height / 2);
+            let mx = this.draw.wrlX(this.input.mouseX);// - this.wrlX(this.width / 2);
+            let my = this.draw.wrlY(this.input.mouseY);// - this.wrlY(this.height / 2);
 
-            let diff = this.editing.zoom;
+            let diff = this.draw.zoom;
             if (this.input.zoom < 0)
-                this.editing.zoom *= 2;
+                this.draw.zoom *= 2;
             else
-                this.editing.zoom /= 2;
-            diff = diff - this.editing.zoom;
+                this.draw.zoom /= 2;
+            diff = diff - this.draw.zoom;
 
-            let vx = this.input.mouseX - this.scrX(mx);
-            let vy = this.input.mouseY - this.scrY(my);
+            let vx = this.input.mouseX - this.draw.scrX(mx);
+            let vy = this.input.mouseY - this.draw.scrY(my);
             console.log(vx);
-            this.editing.scrollX += vx;
-            this.editing.scrollY += vy;
+            this.draw.scrollX += vx;
+            this.draw.scrollY += vy;
             this.input.zoom = 0;
         }
         if (this.input.rightdown)
@@ -305,8 +183,8 @@ export default class Renderer
             {
                 let mx = this.editing.mouseX - this.input.mouseX;
                 let my = this.editing.mouseY - this.input.mouseY;
-                this.editing.scrollX -= mx;
-                this.editing.scrollY -= my
+                this.draw.scrollX -= mx;
+                this.draw.scrollY -= my
                 this.editing.mouseX = this.input.mouseX;
                 this.editing.mouseY = this.input.mouseY;
             }
@@ -319,10 +197,10 @@ export default class Renderer
         if (this.input.grid)
         {
             this.input.grid = false;
-            this.gridSize/=2;
-            if (this.gridSize < 8)
+            this.draw.gridSize/=2;
+            if (this.draw.gridSize < 8)
             {
-                this.gridSize = 64;
+                this.draw.gridSize = 64;
             }
         }
         if (this.input.save)
@@ -382,17 +260,15 @@ export default class Renderer
             }
         }
 
-        let c = this.context;
-        this.width = c.canvas.width;
-        this.height = c.canvas.height;
-        c.clearRect(0,0,this.width, this.height);
-        this.drawGrid();
-        this.drawSnap();
+
+        c.clearRect(0,0,this.draw.width, this.draw.height);
+        this.draw.drawGrid();
         this.drawSectors();
-        this.drawEdges();
-        this.drawVertices();
+        this.draw.drawEdges();
+        this.draw.drawVertices();
         this.drawWorkingSet();
         this.drawSelection();
+        this.draw.drawSnap();
         requestAnimationFrame(()=>this.animate());
     }
 }
