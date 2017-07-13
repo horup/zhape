@@ -84,6 +84,34 @@ export class Map
     sides:Side[] = [];
     sectors:Sector[] = [];
 
+    static toJSON(map:Map)
+    {
+        return JSON.stringify(map);
+    }
+
+    static clone(map:Map)
+    {
+        return this.fromJSON(this.toJSON(map));
+    }
+
+    static fromJSON(json:string)
+    {
+        let map = JSON.parse(json) as Map;
+        Object.setPrototypeOf(map, Map.prototype);
+        for (let obj of map.edges)
+        {
+            Object.setPrototypeOf(obj, Edge.prototype);
+            if (obj.left != null) Object.setPrototypeOf(obj.left, Side.prototype);
+            if (obj.right != null) Object.setPrototypeOf(obj.right, Side.prototype);
+        }
+        for (let obj of map.vertices)
+            Object.setPrototypeOf(obj, Vertex.prototype);
+        for (let obj of map.sectors)
+            Object.setPrototypeOf(obj, Sector);
+
+        return map;
+    }
+
     isClockwise(indicies:number[])
     {
         let sum = 0;
@@ -122,7 +150,10 @@ export class Map
 
     hasLoop(edges:Edge[], start, end)
     {
-        if (start < edges.length && end < edges.length)
+        // Bug in loop finding
+        let l = Math.abs(end-start) + 1;
+        
+        if (start < edges.length && end < edges.length && l >= 3)
         {
             let e1 = edges[start];
             let e2 = edges[end];
@@ -158,6 +189,8 @@ export class Map
                     }
                 }
 
+               
+
                 polygons.push(indicies);
 
                 start = end;
@@ -166,21 +199,32 @@ export class Map
             end++;
         }
 
+        if (sector == 10)
+        {
+            console.log(JSON.stringify(edges));
+        }
+
         return polygons;
     }
 
     isInsideSector(x:number, y:number, sector:number)
     {
-        let indicies = this.getPolygons(sector)[0];
-        console.log(JSON.stringify(indicies));
-        let vertices:number[] = [];
-        for (let index of indicies)
+        let polys = this.getPolygons(sector);
+        if (polys.length > 0)
         {
-            vertices.push(this.vertices[index].x);
-            vertices.push(this.vertices[index].y);
+            let indicies = polys[0];
+            let vertices:number[] = [];
+        
+            for (let index of indicies)
+            {
+                vertices.push(this.vertices[index].x);
+                vertices.push(this.vertices[index].y);
+            }
+
+            return PolyK.ContainsPoint(vertices, x, y);
         }
 
-        return PolyK.ContainsPoint(vertices, x, y);
+        return false;
     }
 
     isInsidePolygon(x:number, y:number, polygon:number[])
