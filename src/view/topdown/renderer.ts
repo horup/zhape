@@ -64,22 +64,6 @@ export default class Renderer
         return y;
     }
 
-
-   
-
-   
-
-    
-
-    drawSectors()
-    {
-        for (let sector = 0; sector < this.map.sectors.length; sector++)
-        {
-          //  if (this.map.isInsideSector(this.mouseX, this.mouseY, sector))
-            //    console.log(sector);
-        }
-    }
-
     drawSelection()
     {
         if (this.editing.state == State.Selection)
@@ -248,11 +232,9 @@ export default class Renderer
 
         c.clearRect(0,0,this.draw.width, this.draw.height);
         this.draw.drawGrid();
-        this.drawSectors();
         this.draw.drawEdges();
         this.draw.drawVertices();
         this.draw.drawWorkingSet();
-        this.drawSelection();
         this.draw.drawSnap();
         requestAnimationFrame(()=>this.animate());
     }
