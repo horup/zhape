@@ -61,12 +61,27 @@ export default class Renderer
         return x;
     }
 
+    wrlX(x:number)
+    {
+        x -= this.editing.scrollX;        
+        x /= this.editing.zoom;
+        return x;
+    }
+
     scrY(y:number)
     {
         y *= this.editing.zoom;
         y += this.editing.scrollY;
         return y;
     }
+
+     wrlY(y:number)
+    {
+        y -= this.editing.scrollY;        
+        y /= this.editing.zoom;
+        return y;
+    }
+    
     
 
     snappedX()
@@ -261,15 +276,21 @@ export default class Renderer
     {
         if (this.input.zoom != 0)
         {
+            let mx = this.wrlX(this.input.mouseX);// - this.wrlX(this.width / 2);
+            let my = this.wrlY(this.input.mouseY);// - this.wrlY(this.height / 2);
+
             let diff = this.editing.zoom;
             if (this.input.zoom < 0)
                 this.editing.zoom *= 2;
             else
                 this.editing.zoom /= 2;
             diff = diff - this.editing.zoom;
-            this.editing.scrollX += this.width * diff/2;
-            this.editing.scrollY += this.height * diff/2;
 
+            let vx = this.input.mouseX - this.scrX(mx);
+            let vy = this.input.mouseY - this.scrY(my);
+            console.log(vx);
+            this.editing.scrollX += vx;
+            this.editing.scrollY += vy;
             this.input.zoom = 0;
         }
         if (this.input.rightdown)
