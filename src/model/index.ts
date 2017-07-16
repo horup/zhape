@@ -1,4 +1,5 @@
 import * as PolyK from 'polyk';
+import * as M from './../math';
 export class Vertex
 {
     x:number;
@@ -150,8 +151,22 @@ export class Map
 
     hasLoop(edges:Edge[], start, end)
     {
-        // Bug in loop finding
-        let l = Math.abs(end-start) + 1;
+        let es:[number, number][] = [];
+        for (let edge of edges)
+        {
+            es.push([edge.start, edge.end]);
+        }
+
+        if (M.findLoop(es) != null)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        // Bug i  n loop finding
+      /*  let l = Math.abs(end-start) + 1;
         
         if (start < edges.length && end < edges.length && l >= 3)
         {
@@ -163,7 +178,7 @@ export class Map
             else if (e1.start == e2.end)
                 return true;
         }
-        return false;
+        return false;*/
     }
 
     getPolygons(sector:number)
@@ -172,31 +187,16 @@ export class Map
         let start = 0;
         let end = 1;
         let polygons:number[][] = [];
-        while (end < this.edges.length)
+        let es:[number, number][] = [];
+        for (let edge of edges)
         {
-            if (this.hasLoop(edges, start, end))
-            {
-                let indicies:number[] = [];
-                for (let i = start; i <= end; i++)
-                {
-                    let vs = [edges[i].start, edges[i].end];
-                    for (let v of vs)
-                    {
-                        if (indicies.indexOf(v) == -1)
-                        {
-                            indicies.push(v);
-                        }
-                    }
-                }
+            es.push([edge.start, edge.end]);
+        }
 
-               
-
-                polygons.push(indicies);
-
-                start = end;
-            }
-
-            end++;
+        let loop = M.findLoop(es);
+        if (loop != null)
+        {
+            polygons.push(loop);
         }
 
         if (sector == 10)
