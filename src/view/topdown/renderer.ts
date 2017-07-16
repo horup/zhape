@@ -39,6 +39,7 @@ export default class Renderer
     }
 
     map:Model.Map = new Model.Map();
+    history = [] as Model.Map[];
     context:CanvasRenderingContext2D;
 
     workingSet:Model.Vertex[] = [];
@@ -108,6 +109,7 @@ export default class Renderer
             
         if (insert)
         {
+            this.history.push(Model.Map.clone(this.map));
             let indicies = this.map.insertVertices(this.workingSet);
             this.map.insertEdges(indicies);
             this.workingSet = [];
@@ -121,6 +123,18 @@ export default class Renderer
         let c = this.context;
         this.draw.width = c.canvas.width;
         this.draw.height = c.canvas.height;
+
+        if (this.input.undo)
+        {
+            this.input.undo = false;
+            if (this.history.length > 0)
+            {
+                let map = this.history[this.history.length - 1];
+                this.history.splice(this.history.length -1, 1);
+                this.map = map;
+            }
+        }
+
         if (this.input.zoom != 0)
         {
             let mx = this.draw.wrlX(this.input.mouseX);// - this.wrlX(this.width / 2);
@@ -135,7 +149,6 @@ export default class Renderer
 
             let vx = this.input.mouseX - this.draw.scrX(mx);
             let vy = this.input.mouseY - this.draw.scrY(my);
-            console.log(vx);
             this.draw.scrollX += vx;
             this.draw.scrollY += vy;
             this.input.zoom = 0;
