@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Renderer from './renderer';
-export default class Topdown extends React.Component<any, {width:number, height:number}>
+export default class Topdown extends React.Component<{enable:boolean}, {width:number, height:number}>
 {
     ctrl = false;
     renderer:Renderer;
@@ -23,6 +23,8 @@ export default class Topdown extends React.Component<any, {width:number, height:
 
         window.addEventListener("mousedown", (e)=>
         {
+            if (!this.props.enable)
+                return;
             if (e.button == 0)
                 this.renderer.input.leftdown = true;
             else
@@ -31,6 +33,9 @@ export default class Topdown extends React.Component<any, {width:number, height:
 
         window.addEventListener("mouseup", (e)=>
         {
+            if (!this.props.enable)
+                return;
+
             if (e.button == 0)
                 this.renderer.input.leftdown = false;
             else
@@ -39,20 +44,19 @@ export default class Topdown extends React.Component<any, {width:number, height:
 
         window.addEventListener("wheel", (e)=>
         {
+            if (!this.props.enable)
+                return;
             let dir = Math.sign(e.deltaY);
             this.renderer.input.zoom = dir;
         });
 
-        window.addEventListener('contextmenu', (e) =>
-        {
-            e.preventDefault();
-            return false;
-        });
 
 
 
         window.addEventListener("keydown", (e)=>
         {
+            if (!this.props.enable)
+                return;
             console.log(e.keyCode);
             if (e.keyCode == 32)
             {
@@ -78,12 +82,16 @@ export default class Topdown extends React.Component<any, {width:number, height:
 
         window.addEventListener("keyup", (e)=>
         {
+            if (!this.props.enable)
+                return;
             if (e.keyCode == 17)
                 this.ctrl = false;
         });
 
         window.addEventListener("mousemove", (e)=>
         {
+            if (!this.props.enable)
+                return;
             this.renderer.input.mouseX = e.x;
             this.renderer.input.mouseY = e.y;
         });
