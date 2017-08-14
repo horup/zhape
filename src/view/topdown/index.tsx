@@ -1,20 +1,23 @@
 import * as React from 'react';
 import Renderer from './renderer';
-export default class Topdown extends React.Component<{enable:boolean}, {width:number, height:number}>
+import {State} from './../../model';
+export default class Topdown extends React.Component<{enable:boolean, sharedState:State}, {width:number, height:number}>
 {
     ctrl = false;
     renderer:Renderer;
+    sharedState:State;
     constructor(props)
     {
         super(props);
-        this.state = {width:window.innerWidth, height:window.innerHeight}
+        this.state = {width:window.innerWidth, height:window.innerHeight};
+        this.sharedState = props.sharedState;
     }
 
     canvas:HTMLCanvasElement;
     componentDidMount()
     {
         let context = this.canvas.getContext('2d');
-        this.renderer = new Renderer(context);
+        this.renderer = new Renderer(context, this.sharedState);
         this.renderer.animate();
         window.addEventListener("resize", () => 
         {
@@ -49,9 +52,6 @@ export default class Topdown extends React.Component<{enable:boolean}, {width:nu
             let dir = Math.sign(e.deltaY);
             this.renderer.input.zoom = dir;
         });
-
-
-
 
         window.addEventListener("keydown", (e)=>
         {

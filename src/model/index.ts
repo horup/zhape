@@ -283,3 +283,13 @@ export class Map
         }
     }
 }
+
+export class State
+{
+    map:Map;
+    
+    constructor()
+    {
+        this.map = new Map();
+    }
+}

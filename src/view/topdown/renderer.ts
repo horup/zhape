@@ -10,6 +10,7 @@ enum State
 
 export default class Renderer
 {
+    state:Model.State;
     draw = new Draw(this);
     input = 
     {
@@ -38,7 +39,6 @@ export default class Renderer
         selectedVerticies:[] as Number[]
     }
 
-    map:Model.Map = new Model.Map();
     history = [] as Model.Map[];
     context:CanvasRenderingContext2D;
 
@@ -46,9 +46,10 @@ export default class Renderer
     edges:{x:number, y:number}[][] = [];
     
 
-    constructor(context:CanvasRenderingContext2D)
+    constructor(context:CanvasRenderingContext2D, state:Model.State)
     {
         this.context = context;
+        this.state = state;
     }
 
     snappedX()
@@ -84,9 +85,9 @@ export default class Renderer
                        this.editing.mouseX, this.editing.mouseY, 
                        this.editing.mouseX, this.input.mouseY];
 
-        for (let i = 0; i < this.map.vertices.length; i++)
+        for (let i = 0; i < this.state.map.vertices.length; i++)
         {
-            if (this.map.isInsidePolygon(this.map.vertices[i].x, this.map.vertices[i].y, polygon))
+            if (this.state.map.isInsidePolygon(this.state.map.vertices[i].x, this.state.map.vertices[i].y, polygon))
             {
                 this.editing.selectedVerticies.push(i);
             }
@@ -109,9 +110,9 @@ export default class Renderer
             
         if (insert)
         {
-            this.history.push(Model.Map.clone(this.map));
-            let indicies = this.map.insertVertices(this.workingSet);
-            this.map.insertEdges(indicies);
+            this.history.push(Model.Map.clone(this.state.map));
+            let indicies = this.state.map.insertVertices(this.workingSet);
+            this.state.map.insertEdges(indicies);
             this.workingSet = [];
         }
     }
@@ -131,7 +132,7 @@ export default class Renderer
             {
                 let map = this.history[this.history.length - 1];
                 this.history.splice(this.history.length -1, 1);
-                this.map = map;
+                this.state.map = map;
             }
         }
 
@@ -188,9 +189,9 @@ export default class Renderer
         if (this.input.save)
         {
             this.input.save = false;
-            if (this.map.edges.length > 0)
+            if (this.state.map.edges.length > 0)
             {
-                localStorage.setItem('quick', JSON.stringify(this.map));
+                localStorage.setItem('quick', JSON.stringify(this.state.map));
             }
         }
         else if (this.input.load)
@@ -209,7 +210,7 @@ export default class Renderer
             for (let obj of map.sectors)
                 Object.setPrototypeOf(obj, Model.Sector);
             
-            this.map = map;
+            this.state.map = map;
         }
         if (this.editing.state == State.Pointer || this.editing.state == State.Selection)
         {

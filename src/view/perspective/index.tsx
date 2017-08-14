@@ -1,11 +1,20 @@
 import * as React from 'react';
-export default class Perspective extends React.Component<{enable:boolean}, any>
+import {State} from './../../model';
+export default class Perspective extends React.Component<{enable:boolean, sharedState:State}, any>
 {
+    sharedState:State;
+
+    constructor(props:any)
+    {
+        super(props);
+        this.sharedState = props.sharedState;
+    }
+
     render()
     {
         return (
             <div>
-                3D
+                {this.sharedState.map.edges.length}
             </div>
         );
     }

@@ -46,7 +46,7 @@ export default class Draw
     drawVertices()
     {
         let c = this.renderer.context;
-        let map = this.renderer.map;
+        let map = this.renderer.state.map;
 
         let s = 3;
         let i = 0;
@@ -64,7 +64,7 @@ export default class Draw
     drawEdges()
     {
         let c = this.renderer.context;
-        let map = this.renderer.map;
+        let map = this.renderer.state.map;
         c.fillStyle = 'white';
         for (let edge of map.edges)
         {

@@ -1,12 +1,14 @@
 import * as React from 'react';
 import Topdown from './topdown';
 import Perspective from './perspective';
-
+import {State} from '../model';
 export default class View extends React.Component<any, {perspective:boolean}>
 {
+    sharedState:State;
     constructor(props:any)
     {
         super(props);
+        this.sharedState = new State();
         this.state = {perspective:true};
     }
 
@@ -49,10 +51,10 @@ export default class View extends React.Component<any, {perspective:boolean}>
         return (
             <div>
                 <div className="fullscreen" style={{display:this.state.perspective ? 'block' : 'none'}}>
-                    <Perspective enable = {this.state.perspective}/>
+                    <Perspective enable = {this.state.perspective} sharedState = {this.sharedState}/>
                 </div>
                 <div className="fullscreen" style={{display:!this.state.perspective ? 'block' : 'none'}}>
-                    <Topdown enable = {!this.state.perspective}/>
+                    <Topdown enable = {!this.state.perspective} sharedState = {this.sharedState}/>
                 </div>
             </div>
         );
