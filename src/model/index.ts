@@ -165,20 +165,6 @@ export class Map
         {
             return false;
         }
-        // Bug i  n loop finding
-      /*  let l = Math.abs(end-start) + 1;
-        
-        if (start < edges.length && end < edges.length && l >= 3)
-        {
-            let e1 = edges[start];
-            let e2 = edges[end];
-
-            if (e1.start == e2.start)
-                return true;
-            else if (e1.start == e2.end)
-                return true;
-        }
-        return false;*/
     }
 
     getPolygons(sector:number)
