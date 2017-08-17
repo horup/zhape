@@ -24,7 +24,8 @@
     "local-web-server": "^1.2.8",
     "style-loader": "^0.18.2",
     "typescript": "^2.3.4",
-    "webpack": "^3.0.0"
+    "webpack": "^3.0.0",
+    "@types/three": "^0.84.13"
   },
   "local-web-server": {
     "port": 8080,
@@ -40,7 +41,8 @@
     "@types/react-dom": "^15.5.1",
     "polyk": "^0.24.0",
     "react": "^15.6.1",
-    "react-dom": "^15.6.1"
+    "react-dom": "^15.6.1",
+    "three": "^0.86.0"
   },
   "main": "webpack.config.js"
 }
