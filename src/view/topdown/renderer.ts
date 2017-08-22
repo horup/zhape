@@ -250,6 +250,7 @@ export default class Renderer
         this.draw.drawVertices();
         this.draw.drawWorkingSet();
         this.draw.drawSnap();
+        this.draw.drawCamera();
         requestAnimationFrame(()=>this.animate());
     }
 }

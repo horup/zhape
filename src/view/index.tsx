@@ -9,7 +9,7 @@ export default class View extends React.Component<any, {perspective:boolean}>
     {
         super(props);
         this.sharedState = new State();
-        this.state = {perspective:true};
+        this.state = {perspective:false};
     }
 
     componentDidMount()

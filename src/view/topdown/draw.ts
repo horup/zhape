@@ -139,6 +139,35 @@ export default class Draw
         }
     }
 
+    drawCamera()
+    {
+        let c = this.renderer.context;
+        let camera = this.renderer.state.camera;
+        let position = camera.position;
+        camera.rotation.yaw += 0.1;
+        let yaw = camera.rotation.yaw;
+        position.x = this.wrlX(this.width / 2);
+        position.y = this.wrlY(this.height / 2);;
+
+        let r = 64;
+        let cx = this.scrX(position.x);
+        let cy = this.scrY(position.y);
+
+        let lx = Math.cos(yaw) * r;
+        let ly = Math.sin(yaw) * r;
+
+        let cr = Math.sqrt(lx * lx + ly * ly) * this.zoom;
+
+        c.beginPath();
+        c.arc(cx, cy, cr, 0, 2 * Math.PI);
+        c.stroke();
+
+        c.beginPath();
+        c.moveTo(cx, cy);
+        c.lineTo(cx + lx * this.zoom, cy + ly * this.zoom);
+        c.stroke();
+    }
+
     drawWorkingSet()
     {
         let c = this.renderer.context;

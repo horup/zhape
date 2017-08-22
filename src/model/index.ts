@@ -284,12 +284,35 @@ export class Map
     }
 }
 
+export class Camera
+{
+    position:
+    {
+        x:number,
+        y:number,
+        z:number
+    }
+
+    rotation:
+    {
+        yaw:number,
+        pitch:number
+    }
+
+    constructor()
+    {
+        this.position = {x:0, y:0, z:0};
+        this.rotation = {yaw:0, pitch:0};
+    }
+}
+
 export class State
 {
     map:Map;
-    
+    camera:Camera;
     constructor()
     {
         this.map = new Map();
+        this.camera = new Camera();
     }
 }
